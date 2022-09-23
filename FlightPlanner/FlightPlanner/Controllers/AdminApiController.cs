@@ -24,8 +24,21 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IActionResult PutFlight(Flight flight)
         {
-            flight = FlightStorage.AddFlight(flight);
-            return Created("", flight);
+            if (!FlightStorage.IsValidValue(flight))
+            {
+                return BadRequest();
+            }
+
+            if (FlightStorage.IsUniqueFlight(flight)) 
+            {
+                flight = FlightStorage.AddFlight(flight);
+                return Created("", flight);
+            }
+            else
+            {
+                return Conflict();
+            }
+
         }
     }
 }
