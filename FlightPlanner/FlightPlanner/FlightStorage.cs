@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace FlightPlanner
 {
@@ -12,6 +13,11 @@ namespace FlightPlanner
             flight.Id = ++_id;
             _flights.Add(flight);
             return flight;
+        }
+
+        public static Flight GetFlight(int id)
+        {
+            return _flights.FirstOrDefault(flight => flight.Id == id);
         }
 
         public static void Clear()
