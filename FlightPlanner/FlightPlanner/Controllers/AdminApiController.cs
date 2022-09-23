@@ -18,6 +18,7 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IActionResult PutFlight(Flight flight)
         {
+            flight = FlightStorage.AddFlight(flight);
             return Created("", flight);
         }
     }
