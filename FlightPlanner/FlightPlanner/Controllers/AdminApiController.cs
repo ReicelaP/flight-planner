@@ -25,7 +25,8 @@ namespace FlightPlanner.Controllers
         public IActionResult PutFlight(Flight flight)
         {
             if (!FlightStorage.IsValidValue(flight) || 
-                !FlightStorage.IsValidDestinationAirport(flight))
+                !FlightStorage.IsValidDestinationAirport(flight) || 
+                !FlightStorage.IsValidArrivalTime(flight))
             {
                 return BadRequest();
             }
@@ -39,7 +40,6 @@ namespace FlightPlanner.Controllers
             {
                 return Conflict();
             }
-
         }
     }
 }
