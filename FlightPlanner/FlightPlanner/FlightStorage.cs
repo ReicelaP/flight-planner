@@ -89,5 +89,11 @@ namespace FlightPlanner
 
             return result <= 0 ? false : true;  
         }
+
+        public static void DeleteFlight(int id)
+        {
+            var flightDelete = _flights.FirstOrDefault(flight => flight.Id == id);
+            _flights.Remove(flightDelete);
+        }
     }
 }

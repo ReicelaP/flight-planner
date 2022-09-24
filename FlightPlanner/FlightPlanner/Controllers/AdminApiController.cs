@@ -41,5 +41,13 @@ namespace FlightPlanner.Controllers
                 return Conflict();
             }
         }
+
+        [Route("flights/{id}")]
+        [HttpDelete]
+        public IActionResult DeleteFlight(int id)
+        {
+            FlightStorage.DeleteFlight(id);
+            return Ok();
+        }
     }
 }
