@@ -24,7 +24,8 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IActionResult PutFlight(Flight flight)
         {
-            if (!FlightStorage.IsValidValue(flight))
+            if (!FlightStorage.IsValidValue(flight) || 
+                !FlightStorage.IsValidDestinationAirport(flight))
             {
                 return BadRequest();
             }

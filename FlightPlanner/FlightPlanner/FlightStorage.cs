@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FlightPlanner
@@ -63,5 +64,18 @@ namespace FlightPlanner
                 !string.IsNullOrEmpty(flight.DepartureTime) &&
                 !string.IsNullOrEmpty(flight.ArrivalTime);
         }
+
+        public static bool IsValidDestinationAirport(Flight flight)
+        {
+            if(flight.From.Country.ToLower() == flight.To.Country.ToLower() ||
+               flight.From.City.ToLower() == flight.To.City.ToLower() ||
+               flight.From.AirportCode.ToLower() == flight.To.AirportCode.ToLower())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
     }
 }
