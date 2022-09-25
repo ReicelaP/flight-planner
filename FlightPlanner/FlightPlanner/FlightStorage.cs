@@ -95,5 +95,36 @@ namespace FlightPlanner
             var flightDelete = _flights.FirstOrDefault(flight => flight.Id == id);
             _flights.Remove(flightDelete);
         }
+
+        public static Airport[] SearchAirport(string search)
+        {
+            var str = search.ToLower().Replace(" ", "");
+
+            var index1 = _flights.IndexOf(_flights.
+                FirstOrDefault(f => f.From.Country.ToLower().Contains(str) || 
+                                    f.From.City.ToLower().Contains(str) ||
+                                    f.From.AirportCode.ToLower().Contains(str)));
+
+            if (index1 > -1)
+            {
+                var result = _flights[index1].From;
+                var arr = new Airport[] { result };
+                return arr;
+            }
+
+            var index2 = _flights.IndexOf(_flights.
+                FirstOrDefault(f => f.To.Country.ToLower().Contains(str) ||
+                                    f.To.City.ToLower().Contains(str) ||
+                                    f.To.AirportCode.ToLower().Contains(str)));
+
+            if (index2 > -1)
+            {
+                var result = _flights[index2].To;
+                var arr = new Airport[] { result };
+                return arr;
+            }
+
+            return null;
+        }
     }
 }
