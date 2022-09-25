@@ -126,5 +126,56 @@ namespace FlightPlanner
 
             return null;
         }
+
+        public static bool IsExistingFlight(int id)
+        {
+            if (id <= _id && id >= 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static PageResult GetFlightsInfoFromSearch(SearchFlightsRequest request)
+        {
+            PageResult pageResult = new PageResult();
+            List<Flight> flightsList = new List<Flight>();
+
+            foreach (var flight in _flights)
+            {
+                if (flight.From.AirportCode.ToString().ToLower() == request.From ||
+                    flight.From.Country.ToString().ToLower() == request.From ||
+                    flight.From.City.ToString().ToLower() == request.From)
+                {
+                    if (flight.To.AirportCode.ToString().ToLower() == request.To ||
+                    flight.To.Country.ToString().ToLower() == request.To ||
+                    flight.To.City.ToString().ToLower() == request.To)
+                    {
+                        if(flight.DepartureTime.Substring(0, 10) == request.DepartureDate)
+                        {
+                            pageResult.Page++;
+                            pageResult.TotalItems++;
+                            flightsList.Add(flight);
+                        }
+                    }
+                }
+            }
+
+            pageResult.Items = flightsList.ToArray();
+
+            if(pageResult.TotalItems > 0)
+            {
+                return pageResult;
+            }
+
+            else
+            {
+                pageResult.Page = 0;
+                pageResult.TotalItems = 0;
+                pageResult.Items = new Flight[0];
+                return pageResult;
+            }            
+        }
     }
 }
