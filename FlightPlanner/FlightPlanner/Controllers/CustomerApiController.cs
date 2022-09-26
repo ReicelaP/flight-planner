@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FlightPlanner.Validations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FlightPlanner.Controllers
 {
@@ -32,8 +33,8 @@ namespace FlightPlanner.Controllers
         [HttpPost]
         public IActionResult FindFlights(SearchFlightsRequest request)              
         {
-            if (SearchFlightsRequest.IsValidSearch(request) && 
-                SearchFlightsRequest.IsValidDestinationAirport(request))
+            if (SearchRequestValidators.IsValidSearch(request) &&
+                SearchRequestValidators.IsValidDestinationAirport(request))
             {
                 return Ok(FlightStorage.GetFlightsInfoFromSearch(request));
             }
