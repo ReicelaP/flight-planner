@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FlightPlanner.Validations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlightPlanner.Controllers
@@ -7,6 +8,8 @@ namespace FlightPlanner.Controllers
     [ApiController, Authorize]
     public class AdminApiController : ControllerBase
     {
+        private static readonly object flightLock = new object();
+
         [Route("flights/{id}")]
         [HttpGet]
         public IActionResult GetFlight(int id)
@@ -24,29 +27,35 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IActionResult PutFlight(Flight flight)
         {
-            if (!FlightStorage.IsValidValue(flight) || 
-                !FlightStorage.IsValidDestinationAirport(flight) || 
-                !FlightStorage.IsValidArrivalTime(flight))
+            lock (flightLock)
             {
-                return BadRequest();
-            }
+                if (!FlightStorageValidators.IsValidValue(flight) ||
+                    !FlightStorageValidators.IsValidDestinationAirport(flight) ||
+                    !FlightStorageValidators.IsValidArrivalTime(flight))
+                {
+                    return BadRequest();
+                }
 
-            if (FlightStorage.IsUniqueFlight(flight)) 
-            {
+                if (!FlightStorage.IsUniqueFlight(flight))
+                {
+                    return Conflict();
+                }
+
                 flight = FlightStorage.AddFlight(flight);
-                return Created("", flight);
             }
-            else
-            {
-                return Conflict();
-            }
+                     
+            return Created("", flight);          
         }
 
         [Route("flights/{id}")]
         [HttpDelete]
         public IActionResult DeleteFlight(int id)
         {
-            FlightStorage.DeleteFlight(id);
+            lock (flightLock)
+            {
+                FlightStorage.DeleteFlight(id);
+            }
+            
             return Ok();
         }
     }

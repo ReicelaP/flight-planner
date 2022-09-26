@@ -7,6 +7,8 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class CustomerApiController : ControllerBase
     {
+        private static readonly object flightLock = new object();
+
         [Route("airports")]
         [HttpGet]
         public IActionResult GetAirport(string search)
@@ -25,21 +27,24 @@ namespace FlightPlanner.Controllers
                 return Ok(result);
             }
             
-            return NotFound();
-            
+            return NotFound();         
         }
 
         [Route("flights/search")]
         [HttpPost]
         public IActionResult FindFlights(SearchFlightsRequest request)              
         {
-            if (SearchRequestValidators.IsValidSearch(request) &&
-                SearchRequestValidators.IsValidDestinationAirport(request))
+            if (!SearchRequestValidators.IsValidSearch(request) ||
+                !SearchRequestValidators.IsValidDestinationAirport(request))
             {
-                return Ok(FlightStorage.GetFlightsInfoFromSearch(request));
+                return BadRequest();
             }
 
-            return BadRequest();         
+            lock (flightLock)
+            {
+                var result = FlightStorage.GetFlightsInfoFromSearch(request);
+                return Ok(result);
+            }         
         }
     }
 }
