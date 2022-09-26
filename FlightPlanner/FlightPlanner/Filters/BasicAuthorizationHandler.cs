@@ -20,15 +20,14 @@ namespace FlightPlanner.Filters
         {
         }
 
-        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            // skip authentication if endpoint has [AllowAnonymous] attribute
             var endpoint = Context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
-                return AuthenticateResult.NoResult();
+                return Task.FromResult(AuthenticateResult.NoResult());
 
             if (!Request.Headers.ContainsKey("Authorization"))
-                return AuthenticateResult.Fail("Missing Authorization Header");
+                return Task.FromResult(AuthenticateResult.Fail("Missing Authorization Header"));
 
             var authorized = false;
             try
@@ -42,11 +41,11 @@ namespace FlightPlanner.Filters
             }
             catch
             {
-                return AuthenticateResult.Fail("Invalid Authorization Header");
+                return Task.FromResult(AuthenticateResult.Fail("Invalid Authorization Header"));
             }
 
             if (!authorized)
-                return AuthenticateResult.Fail("Invalid Username or Password");
+                return Task.FromResult(AuthenticateResult.Fail("Invalid Username or Password"));
 
             var claims = new[] {
                 new Claim(ClaimTypes.Name, "user"),
@@ -55,7 +54,7 @@ namespace FlightPlanner.Filters
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-            return AuthenticateResult.Success(ticket);
+            return Task.FromResult(AuthenticateResult.Success(ticket));
         }
     }
 }
