@@ -31,7 +31,7 @@ namespace FlightPlanner
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthorizationHandler>("BasicAuthentication", null);
 
             services.AddDbContext<FlightPlannerDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("flight-planner")));
+            options.UseSqlite("Filename=mydatabase.db"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
