@@ -1,8 +1,6 @@
 ﻿using FlightPlanner.Validations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace FlightPlanner.Controllers
 {
@@ -17,18 +15,13 @@ namespace FlightPlanner.Controllers
             _context = context;
         }
 
-
         private static readonly object flightLock = new object();
 
         [Route("flights/{id}")]
         [HttpGet]
         public IActionResult GetFlight(int id)
         {
-            //var flight = FlightStorage.GetFlight(id);
-            var flight = _context.Flights
-                .Include(f => f.From)
-                .Include(f => f.To)
-                .FirstOrDefault(f => f.Id == id);
+            var flight = FlightStorage.GetFlight(id, _context);
 
             if(flight == null)
             {
@@ -51,14 +44,12 @@ namespace FlightPlanner.Controllers
                     return BadRequest();
                 }
 
-                if (!FlightStorage.IsUniqueFlight(flight))
+                if (!FlightStorage.IsUniqueFlight(flight, _context))
                 {
                     return Conflict();
                 }
 
-                _context.Flights.Add(flight);
-                _context.SaveChanges();
-                //flight = FlightStorage.AddFlight(flight);
+                FlightStorage.AddFlight(flight, _context);
             }
                      
             return Created("", flight);          
@@ -70,14 +61,7 @@ namespace FlightPlanner.Controllers
         {
             lock (flightLock)
             {
-                var flight = _context.Flights.FirstOrDefault(f => f.Id == id);
-                if (flight != null)
-                {
-                    _context.Flights.Remove(flight);
-                    _context.SaveChanges();
-                }
-
-                //FlightStorage.DeleteFlight(id);
+                FlightStorage.DeleteFlight(id, _context);
             }
             
             return Ok();
