@@ -54,37 +54,12 @@ namespace FlightPlanner
         {
             var str = search.ToLower().Replace(" ", "");
 
-            var flightFrom = _context.Flights
-                .Include(f => f.From)
-                .Include(f => f.To)
-                .FirstOrDefault(f => 
-                    f.From.Country.ToLower().Contains(str) ||
-                    f.From.City.ToLower().Contains(str) ||
-                    f.From.AirportCode.ToLower().Contains(str));
+            var airport = _context.Airports.ToList().FirstOrDefault(a =>
+                a.Country.ToLower().Contains(str) ||
+                a.City.ToLower().Contains(str) ||
+                a.AirportCode.ToLower().Contains(str));
 
-            if (flightFrom.From.Country != null)
-            {
-                var result = flightFrom.From;
-                var arr = new Airport[] { result };
-                return arr;
-            }
-
-            var flightTo = _context.Flights
-                .Include(f => f.From)
-                .Include(f => f.To)
-                .FirstOrDefault(f => 
-                    f.To.Country.ToLower().Contains(str) ||
-                    f.To.City.ToLower().Contains(str) ||
-                    f.To.AirportCode.ToLower().Contains(str));
-
-            if (flightTo.To.Country != null)
-            {
-                var result = flightTo.To;
-                var arr = new Airport[] { result };
-                return arr;
-            }
-
-            return null;
+            return new Airport[] { airport };
         }
 
         public static bool IsExistingFlight(int id)
