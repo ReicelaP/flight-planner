@@ -10,11 +10,7 @@ namespace FlightPlanner.Validations
             flight != null &&
             flight.From != null &&
             flight.To != null &&
-            !string.IsNullOrEmpty(flight.From.Country) &&
-            !string.IsNullOrEmpty(flight.From.City) &&
             !string.IsNullOrEmpty(flight.From.AirportCode) &&
-            !string.IsNullOrEmpty(flight.To.Country) &&
-            !string.IsNullOrEmpty(flight.To.City) &&
             !string.IsNullOrEmpty(flight.To.AirportCode) &&
             !string.IsNullOrEmpty(flight.Carrier) &&
             !string.IsNullOrEmpty(flight.DepartureTime) &&
