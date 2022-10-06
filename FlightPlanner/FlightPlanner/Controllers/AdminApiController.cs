@@ -8,13 +8,21 @@ namespace FlightPlanner.Controllers
     [ApiController, Authorize]
     public class AdminApiController : ControllerBase
     {
+        private readonly FlightPlannerDbContext _context;
+
+        public AdminApiController(FlightPlannerDbContext context)
+        {
+            _context = context;
+        }
+
         private static readonly object flightLock = new object();
 
         [Route("flights/{id}")]
         [HttpGet]
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetFlight(id);
+            var flight = FlightStorage.GetFlight(id, _context);
+
             if(flight == null)
             {
                 return NotFound();
@@ -36,12 +44,12 @@ namespace FlightPlanner.Controllers
                     return BadRequest();
                 }
 
-                if (!FlightStorage.IsUniqueFlight(flight))
+                if (!FlightStorage.IsUniqueFlight(flight, _context))
                 {
                     return Conflict();
                 }
 
-                flight = FlightStorage.AddFlight(flight);
+                FlightStorage.AddFlight(flight, _context);
             }
                      
             return Created("", flight);          
@@ -53,7 +61,7 @@ namespace FlightPlanner.Controllers
         {
             lock (flightLock)
             {
-                FlightStorage.DeleteFlight(id);
+                FlightStorage.DeleteFlight(id, _context);
             }
             
             return Ok();
