@@ -1,4 +1,9 @@
+using FlightPlaner.Core.Models;
+using FlightPlaner.Core.Services;
+using FlightPlaner.Core.Validations;
+using FlightPlanner.Data;
 using FlightPlanner.Filters;
+using FlightPlanner.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +37,18 @@ namespace FlightPlanner
 
             services.AddDbContext<FlightPlannerDbContext>(options =>
             options.UseSqlite("Filename=mydatabase.db"));
+
+            services.AddScoped<IFlightPlannerDbContext, FlightPlannerDbContext>();
+            services.AddScoped<IDbService, DbService>();
+            services.AddScoped<IEntityService<Airport>, EntityService<Airport>>();
+            services.AddScoped<IEntityService<Flight>, EntityService<Flight>>();
+            services.AddScoped<IFlightService, FlightService>();
+            services.AddScoped<IFlightValidator, CarrierValidator>();
+            services.AddScoped<IFlightValidator, FlightTimeValidator>();
+            services.AddScoped<IFlightValidator, FlightAirportValidator>();
+            services.AddScoped<IAirportValidator, AirportCityValidator>();
+            services.AddScoped<IAirportValidator, AirportCountryValidator>();
+            services.AddScoped<IAirportValidator, AirportCodeValidator>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

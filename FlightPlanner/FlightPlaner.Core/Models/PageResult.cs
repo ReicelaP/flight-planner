@@ -1,4 +1,4 @@
-﻿namespace FlightPlanner
+﻿namespace FlightPlaner.Core.Models
 {
     public class PageResult
     {

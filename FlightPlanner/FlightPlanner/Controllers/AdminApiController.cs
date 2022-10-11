@@ -1,18 +1,29 @@
-﻿using FlightPlanner.Validations;
+﻿using FlightPlaner.Core.Models;
+using FlightPlaner.Core.Services;
+using FlightPlaner.Core.Validations;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FlightPlanner.Controllers
 {
     [Route("admin-api")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, EnableCors("")]
     public class AdminApiController : ControllerBase
     {
-        private readonly FlightPlannerDbContext _context;
+        private readonly IFlightService _flightService;
+        private readonly IEnumerable<IFlightValidator> _flightValidators;
+        private readonly IEnumerable<IAirportValidator> _airportValidators;
 
-        public AdminApiController(FlightPlannerDbContext context)
+        public AdminApiController(IFlightService flightService, 
+            IEnumerable<IFlightValidator> flightValidators,
+            IEnumerable<IAirportValidator> airportValidators)
         {
-            _context = context;
+            _flightService = flightService;
+            _flightValidators = flightValidators;
+            _airportValidators = airportValidators;
         }
 
         private static readonly object flightLock = new object();
@@ -21,7 +32,7 @@ namespace FlightPlanner.Controllers
         [HttpGet]
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetFlight(id, _context);
+            var flight = _flightService.GetCompleteFlightById(id);
 
             if(flight == null)
             {
@@ -37,19 +48,19 @@ namespace FlightPlanner.Controllers
         {
             lock (flightLock)
             {
-                if (!FlightStorageValidators.IsValidValue(flight) ||
-                    !FlightStorageValidators.IsValidDestinationAirport(flight) ||
-                    !FlightStorageValidators.IsValidArrivalTime(flight))
+                if(!_flightValidators.All(f => f.IsValid(flight)) ||
+                    !_airportValidators.All(f => f.IsValid(flight?.From)) ||
+                    !_airportValidators.All(f => f.IsValid(flight?.To)))
                 {
                     return BadRequest();
                 }
 
-                if (!FlightStorage.IsUniqueFlight(flight, _context))
+                if (_flightService.Exists(flight))
                 {
                     return Conflict();
                 }
 
-                FlightStorage.AddFlight(flight, _context);
+                _flightService.Create(flight);
             }
                      
             return Created("", flight);          
@@ -59,9 +70,11 @@ namespace FlightPlanner.Controllers
         [HttpDelete]
         public IActionResult DeleteFlight(int id)
         {
-            lock (flightLock)
+            var flight = _flightService.GetById(id);
+
+            if (flight != null)
             {
-                FlightStorage.DeleteFlight(id, _context);
+                _flightService.Delete(flight);
             }
             
             return Ok();
