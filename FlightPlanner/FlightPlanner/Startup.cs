@@ -1,3 +1,4 @@
+using AutoMapper;
 using FlightPlaner.Core.Models;
 using FlightPlaner.Core.Services;
 using FlightPlaner.Core.Validations;
@@ -49,6 +50,7 @@ namespace FlightPlanner
             services.AddScoped<IAirportValidator, AirportCityValidator>();
             services.AddScoped<IAirportValidator, AirportCountryValidator>();
             services.AddScoped<IAirportValidator, AirportCodeValidator>();
+            services.AddSingleton<IMapper>(AutoMapperConfig.CreateMapper());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -63,6 +65,8 @@ namespace FlightPlanner
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();  // ??
 
             app.UseAuthentication();
             app.UseAuthorization();
