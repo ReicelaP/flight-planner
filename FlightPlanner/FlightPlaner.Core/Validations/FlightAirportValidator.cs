@@ -6,10 +6,10 @@ namespace FlightPlaner.Core.Validations
     {
         public bool IsValid(Flight flight)
         {
-            if(flight.From != null && flight.To != null)
+            if (flight.From != null && flight.To != null)
             {
                 return flight.From.AirportCode?.Trim().ToLower() != 
-                    flight.To.AirportCode.Trim().ToLower();
+                       flight.To.AirportCode?.Trim().ToLower();
             }
             
             return false;
