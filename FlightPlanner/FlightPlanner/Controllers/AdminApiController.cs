@@ -4,7 +4,6 @@ using FlightPlaner.Core.Services;
 using FlightPlaner.Core.Validations;
 using FlightPlanner.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ using System.Linq;
 namespace FlightPlanner.Controllers
 {
     [Route("admin-api")]
-    [ApiController, Authorize, EnableCors("")]
+    [ApiController, Authorize]
     public class AdminApiController : ControllerBase
     {
         private readonly IFlightService _flightService;

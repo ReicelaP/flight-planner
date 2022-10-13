@@ -66,8 +66,6 @@ namespace FlightPlanner
 
             app.UseRouting();
 
-            app.UseCors();  // ??
-
             app.UseAuthentication();
             app.UseAuthorization();
 
