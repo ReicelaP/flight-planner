@@ -44,12 +44,17 @@ namespace FlightPlanner
             services.AddScoped<IEntityService<Airport>, EntityService<Airport>>();
             services.AddScoped<IEntityService<Flight>, EntityService<Flight>>();
             services.AddScoped<IFlightService, FlightService>();
+            services.AddScoped<IAirportService, AirportService>();
             services.AddScoped<IFlightValidator, CarrierValidator>();
             services.AddScoped<IFlightValidator, FlightTimeValidator>();
             services.AddScoped<IFlightValidator, FlightAirportValidator>();
             services.AddScoped<IAirportValidator, AirportCityValidator>();
             services.AddScoped<IAirportValidator, AirportCountryValidator>();
             services.AddScoped<IAirportValidator, AirportCodeValidator>();
+            services.AddScoped<ISearchValidator, SearchDeparturedateValidator>();
+            services.AddScoped<ISearchValidator, SearchDestinationValidator>();
+            services.AddScoped<ISearchValidator, SearchFromValidator>();
+            services.AddScoped<ISearchValidator, SearchToValidator>();
             services.AddSingleton<IMapper>(AutoMapperConfig.CreateMapper());
         }
 
