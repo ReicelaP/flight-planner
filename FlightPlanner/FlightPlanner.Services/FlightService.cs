@@ -29,5 +29,21 @@ namespace FlightPlanner.Services
                 f.From.AirportCode == flight.From.AirportCode &&
                 f.To.AirportCode == flight.To.AirportCode);
         }
+
+        public PageResult GetFlightsInfoFromSearch(SearchFlightsRequest request)
+        {
+            var pageResult = new PageResult();
+            pageResult.Page = 0;
+            pageResult.Items = _context.Flights
+                .Include(flight => flight.From)
+                .Include(flight => flight.To)
+                .Where(flight => flight.From.AirportCode == request.From &&
+                                 flight.To.AirportCode == request.To &&
+                                 flight.DepartureTime.Substring(0, 10) == request.DepartureDate).ToArray();
+
+            pageResult.TotalItems = pageResult.Items.Length;
+
+            return pageResult;
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace FlightPlanner
                 cfg.CreateMap<Flight, FlightRequest>();
             });
 
-            config.AssertConfigurationIsValid();  //tikai parbaudei
+            config.AssertConfigurationIsValid();
 
             return config.CreateMapper();
         }
