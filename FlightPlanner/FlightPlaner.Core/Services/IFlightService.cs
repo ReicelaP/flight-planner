@@ -6,5 +6,6 @@ namespace FlightPlaner.Core.Services
     {
         Flight GetCompleteFlightById(int id);
         bool Exists(Flight flight);
+        PageResult GetFlightsInfoFromSearch(SearchFlightsRequest request);
     }
 }
