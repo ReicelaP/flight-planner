@@ -3,6 +3,7 @@ using FlightPlaner.Core.Services;
 using FlightPlanner.Data;
 using System.Collections.Generic;
 using System.Linq;
+using MoreLinq;
 
 namespace FlightPlanner.Services
 {
@@ -21,7 +22,9 @@ namespace FlightPlanner.Services
             airports = _context.Airports.Where(a =>
                 a.Country.ToLower().Contains(str) ||
                 a.City.ToLower().Contains(str) ||
-                a.AirportCode.ToLower().Contains(str)).ToList();
+                a.AirportCode.ToLower().Contains(str))
+                .DistinctBy(a => a.AirportCode)
+                .ToList();
 
             return airports;
         }

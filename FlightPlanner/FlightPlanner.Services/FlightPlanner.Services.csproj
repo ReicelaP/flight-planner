@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="MoreLinq.Source.MoreEnumerable.DistinctBy" Version="1.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FlightPlaner.Core\FlightPlaner.Core.csproj" />
     <ProjectReference Include="..\FlightPlanner.Data\FlightPlanner.Data.csproj" />
   </ItemGroup>
