@@ -7,9 +7,9 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class TestingApiController : ControllerBase
     {
-        private readonly FlightPlannerDbContext _context;
+        private readonly IFlightPlannerDbContext _context;
 
-        public TestingApiController(FlightPlannerDbContext context)
+        public TestingApiController(IFlightPlannerDbContext context)
         {
             _context = context;
         }
