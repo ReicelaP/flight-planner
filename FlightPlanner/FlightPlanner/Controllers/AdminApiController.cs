@@ -18,6 +18,7 @@ namespace FlightPlanner.Controllers
         private readonly IEnumerable<IFlightValidator> _flightValidators;
         private readonly IEnumerable<IAirportValidator> _airportValidators;
         private readonly IMapper _mapper;
+        private static readonly object flightLock = new object();
 
         public AdminApiController(IFlightService flightService, 
             IEnumerable<IFlightValidator> flightValidators,
@@ -49,21 +50,26 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IActionResult PutFlight(FlightRequest request)
         {
+            var result = new ServiceResult(true);
             var flight = _mapper.Map<Flight>(request);
 
             if (!_flightValidators.All(f => f.IsValid(flight)) ||
-                !_airportValidators.All(f => f.IsValid(flight?.From)) ||
-                !_airportValidators.All(f => f.IsValid(flight?.To)))
+                    !_airportValidators.All(f => f.IsValid(flight?.From)) ||
+                    !_airportValidators.All(f => f.IsValid(flight?.To)))
             {
                 return BadRequest();
             }
 
-            if (_flightService.Exists(flight))
+            lock (flightLock)
             {
-                return Conflict();
+                if (_flightService.Exists(flight))
+                {
+                    return Conflict();
+                }
+
+                result = _flightService.Create(flight);
             }
 
-            var result = _flightService.Create(flight);
             if (result.Success)
             {
                 request = _mapper.Map<FlightRequest>(flight);
