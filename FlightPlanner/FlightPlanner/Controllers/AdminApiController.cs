@@ -43,6 +43,7 @@ namespace FlightPlanner.Controllers
             }
 
             var response = _mapper.Map<FlightRequest>(flight);
+
             return Ok(response);
         }
 
@@ -54,8 +55,8 @@ namespace FlightPlanner.Controllers
             var flight = _mapper.Map<Flight>(request);
 
             if (!_flightValidators.All(f => f.IsValid(flight)) ||
-                    !_airportValidators.All(f => f.IsValid(flight?.From)) ||
-                    !_airportValidators.All(f => f.IsValid(flight?.To)))
+                !_airportValidators.All(f => f.IsValid(flight?.From)) ||
+                !_airportValidators.All(f => f.IsValid(flight?.To)))
             {
                 return BadRequest();
             }
@@ -88,6 +89,7 @@ namespace FlightPlanner.Controllers
             if (flight != null)
             {
                 var result = _flightService.Delete(flight);
+
                 if (result.Success)
                 {
                     return Ok();

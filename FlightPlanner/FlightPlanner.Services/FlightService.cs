@@ -34,6 +34,7 @@ namespace FlightPlanner.Services
         {
             var pageResult = new PageResult();
             pageResult.Page = 0;
+
             pageResult.Items = _context.Flights
                 .Include(flight => flight.From)
                 .Include(flight => flight.To)

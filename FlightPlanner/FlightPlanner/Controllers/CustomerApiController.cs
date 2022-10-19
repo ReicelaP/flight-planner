@@ -57,6 +57,7 @@ namespace FlightPlanner.Controllers
             }
 
             var response = _mapper.Map<FlightRequest>(flight);
+
             return Ok(response);
         }
 
@@ -70,6 +71,7 @@ namespace FlightPlanner.Controllers
             }
 
             var result = _flightService.GetFlightsInfoFromSearch(request);
+
             return Ok(result);
         }
     }

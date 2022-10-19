@@ -16,6 +16,7 @@ namespace FlightPlanner
 
                 cfg.CreateMap<Airport, AirportRequest>()
                     .ForMember(d => d.Airport, opt => opt.MapFrom(s => s.AirportCode));
+                
                 cfg.CreateMap<FlightRequest, Flight>();
                 cfg.CreateMap<Flight, FlightRequest>();
             });
