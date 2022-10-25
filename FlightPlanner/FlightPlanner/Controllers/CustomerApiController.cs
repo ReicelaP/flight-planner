@@ -1,5 +1,11 @@
-﻿using FlightPlanner.Validations;
+﻿using AutoMapper;
+using FlightPlaner.Core.Models;
+using FlightPlaner.Core.Services;
+using FlightPlaner.Core.Validations;
+using FlightPlanner.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FlightPlanner.Controllers
 {
@@ -7,51 +13,66 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class CustomerApiController : ControllerBase
     {
-        private readonly FlightPlannerDbContext _context;
+        private readonly IAirportService _airportService;
+        private readonly IFlightService _flightService;
+        private readonly IEnumerable<ISearchValidator> _searchValidators;
+        private readonly IMapper _mapper;
 
-        public CustomerApiController(FlightPlannerDbContext context)
+        public CustomerApiController(IAirportService airportService, 
+            IFlightService flightService,
+            IEnumerable<ISearchValidator> searchValidators,
+            IMapper mapper)
         {
-            _context = context;
+            _airportService = airportService;
+            _flightService = flightService;
+            _searchValidators = searchValidators;
+            _mapper = mapper;
         }
-
-        private static readonly object flightLock = new object();
 
         [Route("airports")]
         [HttpGet]
         public IActionResult GetAirport(string search)
         {
-            var result = FlightStorage.SearchAirport(search, _context);
-            return Ok(result);
+            var airports = _airportService.SearchAirport(search);
+            var airportsRequest = new List<AirportRequest>();
+
+            foreach (Airport airport in airports)
+            {
+                var response = _mapper.Map<AirportRequest>(airport);
+                airportsRequest.Add(response);
+            }
+
+            return Ok(airportsRequest.ToArray());
         }
 
         [Route("flights/{id}")]
         [HttpGet]
         public IActionResult FindFlightById(int id)
         {
-            if (FlightStorage.IsExistingFlight(id))
+            var flight = _flightService.GetCompleteFlightById(id);
+
+            if (flight == null)
             {
-                var result = FlightStorage.GetFlight(id, _context);
-                return Ok(result);
+                return NotFound();
             }
-            
-            return NotFound();         
+
+            var response = _mapper.Map<FlightRequest>(flight);
+
+            return Ok(response);
         }
 
         [Route("flights/search")]
         [HttpPost]
-        public IActionResult FindFlights(SearchFlightsRequest request)              
+        public IActionResult FindFlights(SearchFlightsRequest request)
         {
-            if (!SearchRequestValidators.IsValidSearch(request) ||
-                !SearchRequestValidators.IsValidDestinationAirport(request))
+            if (!_searchValidators.All(s => s.IsValid(request)))
             {
                 return BadRequest();
             }
 
-            lock (flightLock)
-            {
-                var result = FlightStorage.GetFlightsInfoFromSearch(request, _context);
-                return Ok(result);
-            }         
+            var result = _flightService.GetFlightsInfoFromSearch(request);
+
+            return Ok(result);
         }
     }
 }
